@@ -3,7 +3,7 @@
 # OLS
 # Name: Krzysztof Osesik
 
-rm(list=ls())
+# rm(list=ls())
   
 library(tidyverse)
 library(jtools)
@@ -36,6 +36,7 @@ lmtest::bptest(model)
 # p-value is very low, thus we can reject the H0 that the error term is homoscedastic
 
 plot(model$residuals)
+rcompanion::plotNormalHistogram(model$residuals)
 
 tseries::jarque.bera.test(model$residuals)
 
@@ -47,11 +48,72 @@ tseries::jarque.bera.test(model$residuals)
   # Nitro - how much nitrogen is used on the fields in the neighborhood
 
 
+plot(hedonic$farmland,model$residuals)
+stats::scatter.smooth(rstandard(model)~hedonic$farmland, col="grey")
+
+
+plot(hedonic$nitro,model$residuals)
+stats::scatter.smooth(rstandard(model)~hedonic$nitro, col="grey")
+
+
+
+
+
 
 ## Excercise 2: Try to find a proper functional form for this model
   # Focus on the nonlinear relationships for variables farmland and nitro (they are the focus of this analysis)
   # Of course you may also transform some other variables (for example, factor variables)
   # Try adding some interactions between variables
+
+ 
+
+plot(hedonic$farmland, hedonic$price)
+plot(hedonic$nitro, hedonic$price)
+
+# MODEL 2 (log of price)
+
+hedonic$logprice<-log(hedonic$price)
+
+model_2<-lm(logprice~.-price,data=hedonic) # independent variable is everything except for the price variable
+
+summary(model_2)
+
+# after taking a log of price, the R-squared did not improve by much 
+
+
+lmtest::resettest(model_2) # p-value still <0.05
+
+
+
+##################################
+
+
+
+plot(hedonic$farmland, hedonic$logprice)
+plot(hedonic$nitro, hedonic$logprice)
+
+# MODEL 3 
+
+hedonic$lognitro<-log(hedonic$nitro)
+
+hedonic$lognitro[hedonic$lognitro=="-Inf"]<-0
+
+model_3<-lm(logprice~.-nitro -price,data=hedonic) # independent variable is everything except for the price variable
+
+summary(model_3)
+
+# after taking a log of price, the R-squared did not improve by much 
+
+
+lmtest::resettest(model_3) # p-value still <0.05
+
+
+
+plot(hedonic$lognitro, hedonic$logprice)
+
+
+
+
 
 
 

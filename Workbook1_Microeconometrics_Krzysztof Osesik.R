@@ -124,7 +124,7 @@ im<-influence.measures(model_3)
 colSums(im$is.inf)
 
 
-# no influential variables
+# no influential observations
 
 
 ## Excercise 4: Use splines and box-cox transformations to further explore these non-linear relationships

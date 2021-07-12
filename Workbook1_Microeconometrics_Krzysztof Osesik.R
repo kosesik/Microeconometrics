@@ -132,6 +132,25 @@ plot(hedonic$lognitro, hedonic$logprice)
   # Is variance of error term constant? If not: which variables does it depend on? 
 
 
+X_m<-model.matrix(~logprice+age+factor(repair)+factor(rooms)+lot+factor(county)+
+                    vacant+population+avincome+farmland+lognitro, data=hedonic)[,-1]
+
+
+X_s<-model.matrix(~logprice+age+factor(repair)+factor(rooms)+lot+factor(county)+
+                    vacant+population+avincome+farmland+lognitro, data=hedonic)[,-1]
+
+
+model_htscd<-lmvar(hedonic$logprice, X_mu=X_m, X_sigma = X_s)
+
+
+summary(model_htscd)
+
+
+
+# For heteroskedasticity analysis, it turns out that age variable and farmland variable are affecting the variance
+# of the error term. Both variables were found to be significant in terms of affecting the variance of the error term. 
+# The higher the age, and the higher the value fo farmland the higher is the variance of the error term.
+
 
 ## Summary of your findings: 
 

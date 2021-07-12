@@ -120,6 +120,11 @@ plot(hedonic$lognitro, hedonic$logprice)
 ## Excercise 3: Check whether there are any influential observations in the model from the previous excercise
 
 
+im<-influence.measures(model_3)
+colSums(im$is.inf)
+
+
+# no influential variables
 
 
 ## Excercise 4: Use splines and box-cox transformations to further explore these non-linear relationships

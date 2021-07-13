@@ -28,14 +28,45 @@ summary(model_poisson)
 
 # Compare models' fit to data
 
+beta_tobit<-coef(model_tobit)[1:8]
+sigma_tobit<-exp(coef(model_tobit)["logSigma"])
+x_tobit<-model.matrix(~kidslt6+kidsge6+age+educ+husage+faminc+unem, data=femlab)
+fit_tobit<-x_tobit%*%beta_tobit
+
+
+Fit_norm_tobit <- fit_tobit/sqrt(sigma_tobit)
+Mills_tobit<-dnorm(Fit_norm_tobit)/pnorm(Fit_norm_tobit)
+Pred_tobit <- pnorm(Fit_norm_tobit)*(fit_tobit+sqrt(sigma_tobit)*Mills_tobit)
+
+err_tobit<-abs(femlab$hours-Pred_tobit)
+
+err_poisson<-abs(femlab$hours-predict(model_poisson, type="response"))
+
+
+mean(err_tobit, na.rm = T); mean(err_poisson)
+
+
+median(err_tobit, na.rm=T); median(err_poisson)
+
+
+
 # Summary of the result: 
+
+# A slightly lower mean and median of the error term is offered by the Tobit model
+
+
+
+
+
+
+
 
 
 ## Exercise 2: Analyze what affects whether people care about culture in Warsaw
 rm(list=ls())
 Culture <- read_excel("Culture.xls")
 
-# Wiœniewska, A., Budziñski, W., & Czajkowski, M. (2020). An economic valuation of access to cultural institutions: museums, theatres, and cinemas. Journal of Cultural Economics, 44(4), 563-587.
+# Wi???niewska, A., Budzi???ski, W., & Czajkowski, M. (2020). An economic valuation of access to cultural institutions: museums, theatres, and cinemas. Journal of Cultural Economics, 44(4), 563-587.
 
 # Description
 # Theatre - no. of visits to theatres in the last 12 months

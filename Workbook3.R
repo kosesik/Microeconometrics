@@ -63,7 +63,9 @@ median(err_tobit, na.rm=T); median(err_poisson)
 
 
 ## Exercise 2: Analyze what affects whether people care about culture in Warsaw
-rm(list=ls())
+# rm(list=ls())
+
+library(readxl)
 Culture <- read_excel("Culture.xls")
 
 # Wi???niewska, A., Budzi???ski, W., & Czajkowski, M. (2020). An economic valuation of access to cultural institutions: museums, theatres, and cinemas. Journal of Cultural Economics, 44(4), 563-587.
@@ -84,18 +86,45 @@ Culture <- read_excel("Culture.xls")
 
 # 2.1 Recode variable motcultu, so that I dont know would be a third level (rather than fifth)
 
+hist(as.numeric(Culture$motcultu))
+
+Culture$motcultu<-factor(Culture$motcultu,
+                         levels = c("1","2","5","4","3"),
+                         labels=c("1","2","3","4","5"))
 
 # 2.2 Estimate ordered logit
+
+Culture$income<-Culture$income/1000
+
+frml <- motcultu ~ Theatre + income + inc_miss + hhpeop + age + wars +
+  factor(havejob) + factor(edugroup) + factor(havech) 
+model_ordered <- ologit.reg(frml, data=Culture)
+summary(model_ordered)
+
 
 
 # 2.3. Calculate marginal effects and interpret the results
 
+margins.oglmx(model_ordered, AME=TRUE)
+
+# For each outcome possible (1-5) we estimated what is an influence of each variable. 
+# For example, for outcome 1 ( definitely agree) it seems that the higher the education level, 
+# the more likely a person is to give that answer. by the same token, for the outcome 5 (definately disagree)
+# the more visits a person had to a theater the less likely they were to give answer 5.
+
 
 # 2.4 Estimate model with heteroskedasticity 
 
+model_ordered_htskd<-oglmx(motcultu ~ Theatre + income + inc_miss + hhpeop + age + wars +
+                             havejob + edugroup + havech, ~ inc_miss+Theatre+havejob, data=Culture, constantMEAN = F, constantSD = F)
+
+summary(model_ordered_htskd)
 
 
-## Exercise 3: Conduct Travel Cost analysis for visits in theatres in Warsaw
+
+
+
+ ## Exercise 3: Conduct Travel Cost analysis for visits in theatres in Warsaw
 # 3.1 Estimate a basic demand function using Poisson regression
 
 

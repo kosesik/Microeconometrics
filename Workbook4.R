@@ -7,6 +7,24 @@
 # setwd("C:\\Users\\Admin\\Documents\\ME2021\\English")   
 
 library(readxl)
+library(psych)
+library(statmod)
+library(dummies)
+library(MASS)
+library(mfx)
+library(oglmx)
+library(pscl)
+library(msm)
+library(nlWaldTest)
+library(glmx)
+library(car)
+library(lfe)
+library(ivpack)
+library(ivmodel)
+library(REndo)
+library(lava)
+library(Hmisc)
+
 Culture <- read_excel("Culture.xls")
 
 # Description
@@ -93,16 +111,35 @@ lrtest(model_poisson, model_nb)
 
 Culture$income<-Culture$income/1000
 
-frml_z<-Theatre~motcultu+cs+income+factor(inc_miss)+hhpeop+age+wars+factor(havejob)+factor(edugroup)+factor(havech) | factor(motcultu)+age # no income variable
+frml_z<-Theatre~motcultu+cs+income+factor(inc_miss)+hhpeop+age+wars+factor(havejob)+factor(edugroup)+factor(havech) | factor(motcultu)+age 
 model_z<-zeroinfl(frml_z, data=Culture, dist="poisson")
 summary(model_z)
+
+
+
+### HURDLE MODEL
+
+model_hurdle<-hurdle(frml_z, dist="poisson", data=Culture)
+summary(model_hurdle)
+
+
+# For the zero hurdle part of the summary - it looks like the less one cares about cultre in Warsaw , the less one is likely to visit a Theatre at least once 
+# (coefficients) for factor (motcultu 2-5 ) are negative and generally decreasing )
+
+model_hurdle_zero<-hurdle(frml_z, dist="poisson", zero.dist = "poisson",data=Culture)
+summary(model_hurdle_zero)
+
+
+extractAIC(model_hurdle); extractAIC(model_hurdle_zero) # no difference
+
+
 
 
 # People with higher motcultu level are more likely to not visit Theatre at all (number of visits = 0)
 
 
 ######################################################################################################
-rm(list=ls())
+# rm(list=ls())
 wage <- read_excel("wage.xls")
 
 # Description
@@ -126,23 +163,94 @@ wage <- read_excel("wage.xls")
 
 # 1.1 Get rid of missings observation from the data
 
+str(wage)
+
+wage_compl<-wage[complete.cases(wage),]
+
+str(wage_compl)
+
 
 # 1.2 Estimate OLS with lwage being a dependent variable (dont use variables fatheduc, motheduc, nearc2, nearc4) 
+
+frml<-lwage~educ+age+black+married
+model_lm<-lm(frml, data=wage_compl)
+summary(model_lm)
 
 
 # 1.3 Estimate to 2SLS models in which educ is endogeneous. Use either fatheduc, motheduc as instruments or nearc2, nearc4
 # Comment on whether results differ from OLS
 
+frml_sls<- lwage~educ+age+black+married | motheduc+age+black+married
+model_sls <- ivreg(frml_sls, data=wage_compl)
+summary(model_sls)
+
+stargazer(model_lm,model_sls, type="text", df=FALSE)
+
+
+# no endogenity ?? coeficient in the model with IV is actgually higher than in OLS (!?)
+
+
+
+model_educ<-lm(educ~motheduc+age+black+married, data=wage_compl)
+summary(model_educ)
+
+
+
+
+
 
 # 1.4 Check using Hausman and Wu-Hausman tests whether the estimate models indicate endogeneity of education
+
+
+### HAUSMANN
+
+coef_diff =  coef(model_sls) - coef(model_lm)
+vc_diff   =  vcov(model_sls) - vcov(model_lm)
+endo_diff =  as.vector(t(coef_diff) %*% solve(vc_diff) %*% coef_diff)
+pchisq(endo_diff, df=6, lower.tail = FALSE)  
+
+
+# p-value is small, at the level of 0.05 level of significance, we would reject the null hypothesis that there is no endogenity in the model
+
+
+### WU-HAUSMANN
+
+
+summary(model_sls,diagnostics=TRUE)
+
+# again - p-value for the Wu-Hausmann test is very small, whch leads us to reject the HO = there is no endogenity in the model
+
+
+
 
 
 # 1.5 Use Sargan test to check whether instruments are valid and then check whether instruments are weak
 
 
+frml_sargan<-lwage~educ+age+black+married | fatheduc+motheduc+age+black+married
+model_sargan<-ivreg(frml_sargan, data=wage_compl)
+summary(model_sargan, diagnostics=TRUE)
+
+
+# p-value for the Sargan test is higher than 0.05, which does not allow us to reject the H0 that 
+# our IVs are not correlated with the error term
+
+
+
+
+
+
 # 1.6 Compare estimates from 2SLS models with estimates from LIML and Fuller's LIML 
+
+# not required
+
+
+
+
 
 
 ## Excercise 2: Use simulation to test how control function approach works in an ordered logit case
 # Evaluate estimated coefficients as well as their ratios
+
+
 

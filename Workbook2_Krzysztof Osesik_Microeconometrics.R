@@ -111,6 +111,11 @@ colSums(im$is.inf)
   # visualize the differences on the plot
 
 
+
+# NOT REQUIRED
+
+
+
 ## Excercise 3: Read femlab.rds and estimate OLS model in which no. of hours that women worked (hours) is a dependent variable
 rm(list=ls())
 setwd("C:\\Users\\Admin\\Documents\\ME2021\\English")        # sets the access path (sometimes change the characters '\' to '/' is needed)
@@ -124,3 +129,9 @@ mean(femlab$hours == 0)
 
 
 # Compare models' fit to data
+
+
+
+
+
+# NOT REQUIRED

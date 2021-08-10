@@ -124,7 +124,11 @@ summary(model_ordered_htskd)
 
 
 
- ## Exercise 3: Conduct Travel Cost analysis for visits in theatres in Warsaw
+ ## Exercise 3: Conduct Travel Cost analysis for visits in theatres in Warsaw 
+
+# NOT REQUIRED
+
+
 # 3.1 Estimate a basic demand function using Poisson regression
 
 

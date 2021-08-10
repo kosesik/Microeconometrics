@@ -103,6 +103,11 @@ colSums(im$is.inf)
 
 
 ## Excercise 2: Estimate Quantile regression model
+
+# NOT REQUIRED
+
+
+
  # estimate models for different quantiles
  # analyze how parameters change between different quantiles
 
@@ -112,11 +117,15 @@ colSums(im$is.inf)
 
 
 
-# NOT REQUIRED
+
 
 
 
 ## Excercise 3: Read femlab.rds and estimate OLS model in which no. of hours that women worked (hours) is a dependent variable
+
+# NOT REQUIRED
+
+
 rm(list=ls())
 setwd("C:\\Users\\Admin\\Documents\\ME2021\\English")        # sets the access path (sometimes change the characters '\' to '/' is needed)
 femlab <- readRDS("me.femlab.rds")
@@ -133,5 +142,3 @@ mean(femlab$hours == 0)
 
 
 
-
-# NOT REQUIRED
